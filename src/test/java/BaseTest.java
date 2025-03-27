@@ -1,5 +1,6 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -85,5 +86,34 @@ public class BaseTest {
 
     public String generateRandomName(){
         return UUID.randomUUID().toString().replace("-","");
+    }
+
+    public void searchSong(String song){
+        WebElement searchField = driver.findElement(By.cssSelector("[type='search']"));
+        searchField.clear();
+        searchField.sendKeys(song);
+        searchField.sendKeys(Keys.RETURN);
+    }
+
+    public void viewSearchResults() {
+        WebElement viewAll = driver.findElement(By.cssSelector("button[data-test='view-all-songs-btn']"));
+        viewAll.click();
+    }
+
+    public void chooseFirstSong() {
+        WebElement firstSong = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//table[@class='items']//tr[1]"));
+        firstSong.click();
+    }
+
+    public void clickAddToButton() {
+        WebElement addToButton = driver.findElement(By.cssSelector("[class='btn-add-to']"));
+        addToButton.click();
+    }
+
+    public void choosePlaylist() {
+        //WebElement playlist = driver.findElement(By.cssSelector("section[id='queueWrapper'] li:nth-of-type(5)"));
+        //WebElement playlist = driver.findElement(By.xpath("//section[@id='queueWrapper']//li[5]"));
+        WebElement playlist = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//li[contains(text(),'1234')]"));
+        playlist.click();
     }
 }
