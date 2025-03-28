@@ -110,10 +110,41 @@ public class BaseTest {
         addToButton.click();
     }
 
-    public void choosePlaylist() {
+    public void choosePlaylistToAddToSong(String playlistName) {
         //WebElement playlist = driver.findElement(By.cssSelector("section[id='queueWrapper'] li:nth-of-type(5)"));
         //WebElement playlist = driver.findElement(By.xpath("//section[@id='queueWrapper']//li[5]"));
-        WebElement playlist = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//li[contains(text(),'1234')]"));
+        WebElement playlist = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//li[contains(text(),'" + playlistName + "')]"));
         playlist.click();
+    }
+
+    protected void selectPlaylist() {
+        WebElement selectedPlaylist = driver.findElement(By.xpath("//section[@id='playlists']//li[6]"));
+        selectedPlaylist.click();
+    }
+
+    protected void removePlaylist() {
+        WebElement deleteButton = driver.findElement(By.xpath("//button[@class='del btn-delete-playlist']"));
+        deleteButton.click();
+    }
+
+    protected void confirmDelete() {
+        WebElement okButton = driver.findElement(By.xpath("//button[@class='ok']"));
+        okButton.click();
+    }
+
+    protected void clickAddPlaylistButton() {
+        WebElement addPlaylistButton = driver.findElement(By.xpath("//i[@data-testid='sidebar-create-playlist-btn']"));
+        addPlaylistButton.click();
+    }
+
+    protected void clickNewPlaylist() {
+        WebElement newPlaylist = driver.findElement(By.xpath("//li[@data-testid='playlist-context-menu-create-simple']"));
+        newPlaylist.click();
+    }
+
+    protected void inputPlaylistName(String name) {
+        WebElement playlistNameField = driver.findElement(By.xpath("//form[@class='create']//input"));
+        playlistNameField.sendKeys(name);
+        playlistNameField.sendKeys(Keys.RETURN);
     }
 }
