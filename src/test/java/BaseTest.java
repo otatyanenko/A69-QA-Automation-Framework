@@ -110,7 +110,7 @@ public class BaseTest {
         addToButton.click();
     }
 
-    public void choosePlaylistToAddToSong(String playlistName) {
+    public void choosePlaylistToAddSongTo(String playlistName) {
         //WebElement playlist = driver.findElement(By.cssSelector("section[id='queueWrapper'] li:nth-of-type(5)"));
         //WebElement playlist = driver.findElement(By.xpath("//section[@id='queueWrapper']//li[5]"));
         WebElement playlist = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//li[contains(text(),'" + playlistName + "')]"));

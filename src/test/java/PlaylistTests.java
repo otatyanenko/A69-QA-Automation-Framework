@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 public class PlaylistTests extends BaseTest{
     public String playlistName = "1234";
-    
+
     @Test
     public void addPlaylist() throws InterruptedException {
         String expectedAlert = "Created playlist \"" + playlistName + ".\"";
@@ -39,7 +39,7 @@ public class PlaylistTests extends BaseTest{
         chooseFirstSong();
         clickAddToButton();
         Thread.sleep(2000);
-        choosePlaylistToAddToSong(playlistName);
+        choosePlaylistToAddSongTo(playlistName);
         Thread.sleep(1000);
         WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
         Assert.assertEquals(alert.getText(),expectedAlert);
