@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
+<!--  This is how to comment out in the xml  -->
 <suite name="TestNG">
-
+    <parameter name="BaseURL" value ="https://qa.koel.app/"/>
     <test name="Example Test" preserve-order="false">
         <classes>
             <class name="LoginTests"/>
             <class name="BaseTest"/>
-            <class name="Homework16"/>
+            <class name="RegistrationTests"/>
+            <class name="ProfileTests"/>
+            <class name="PlaylistTests"/>
         </classes>
     </test>
 </suite>
+
