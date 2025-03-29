@@ -18,13 +18,13 @@ public class LoginTests extends BaseTest {
 
     }
 
-    @Test
-    public void loginInvalidEmailValidPassword() {
+    @Test (dataProvider = "IncorrectLoginData", dataProviderClass = BaseTest.class)
+    public void loginInvalidEmailValidPassword(String email, String password) {
 
         //Steps
         navigateToPage();
-        provideEmail("invalid@testpro.io");
-        providePassword("8qUBYosp");
+        provideEmail(email);
+        providePassword(password);
         clickSubmit();
 
         //Expected Result
