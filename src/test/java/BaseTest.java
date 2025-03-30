@@ -163,4 +163,14 @@ public class BaseTest {
         playlistNameField.sendKeys(name);
         playlistNameField.sendKeys(Keys.RETURN);
     }
+
+    protected void playNextSong() {
+        WebElement nextSongButton = driver.findElement(By.xpath("//i[@data-testid='play-next-btn']"));
+        nextSongButton.click();
+    }
+
+    protected void clickPlaySong() {
+        WebElement playButton = driver.findElement(By.xpath("//span[@data-testid='play-btn']"));
+        playButton.click();
+    }
 }
