@@ -6,10 +6,11 @@
     <parameter name="BaseURL" value ="https://qa.koel.app/"/>
     <test name="Test" preserve-order="false">
         <classes>
-            <class name="SongTests">
-                <methods>
-                    <include name="playSong"/>
-                </methods>
+            <class name="PlaylistTests">
+                <!-- <methods>
+                    <include name="deletePlaylist"/>
+                   </methods>
+                -->
             </class>
 
         </classes>

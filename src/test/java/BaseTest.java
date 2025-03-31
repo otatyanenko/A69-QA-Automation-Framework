@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.annotations.*;
 
 import java.time.Duration;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 public class BaseTest {
@@ -133,43 +134,57 @@ public class BaseTest {
         playlist.click();
     }
 
-    protected void selectPlaylist() {
-        WebElement selectedPlaylist = driver.findElement(By.xpath("//section[@id='playlists']//li[6]"));
-        selectedPlaylist.click();
+    public boolean selectPlaylist(String playlistName) {
+        boolean exists = false; //default playlist does not exist
+        try {
+            //Find the element using xpath
+            WebElement selectedPlaylist = driver.findElement(By.xpath("//section[@id='playlists']//a[contains(text(), '" + playlistName + "')]"));
+            //check if element is displayed / exists
+           if(selectedPlaylist.isDisplayed()) {
+                selectedPlaylist.click();
+                exists = true; // set to true element found
+           }
+        } catch (NoSuchElementException e){
+            // we are allowing for our program to continue
+        } catch (Exception e){
+            // just in case there are other exceptions like timeout
+        }
+
+        return exists;
     }
 
-    protected void removePlaylist() {
+    public void removePlaylist() {
         WebElement deleteButton = driver.findElement(By.xpath("//button[@class='del btn-delete-playlist']"));
         deleteButton.click();
     }
 
-    protected void confirmDelete() {
+    public void confirmDelete() {
         WebElement okButton = driver.findElement(By.xpath("//button[@class='ok']"));
         okButton.click();
     }
 
-    protected void clickAddPlaylistButton() {
+    public void clickAddPlaylistButton() {
         WebElement addPlaylistButton = driver.findElement(By.xpath("//i[@data-testid='sidebar-create-playlist-btn']"));
         addPlaylistButton.click();
     }
 
-    protected void clickNewPlaylist() {
+    public void clickNewPlaylist() {
         WebElement newPlaylist = driver.findElement(By.xpath("//li[@data-testid='playlist-context-menu-create-simple']"));
         newPlaylist.click();
     }
 
-    protected void inputPlaylistName(String name) {
+    public void inputPlaylistName(String name) {
         WebElement playlistNameField = driver.findElement(By.xpath("//form[@class='create']//input"));
         playlistNameField.sendKeys(name);
         playlistNameField.sendKeys(Keys.RETURN);
     }
 
-    protected void playNextSong() {
+    public void playNextSong() {
         WebElement nextSongButton = driver.findElement(By.xpath("//i[@data-testid='play-next-btn']"));
         nextSongButton.click();
     }
 
-    protected void clickPlaySong() {
+    public void clickPlaySong() {
         WebElement playButton = driver.findElement(By.xpath("//span[@data-testid='play-btn']"));
         playButton.click();
     }
