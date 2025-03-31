@@ -5,23 +5,55 @@ import org.testng.annotations.Test;
 
 public class PlaylistTests extends BaseTest{
     public String playlistName = "1234";
+    public boolean alreadyLoggedIn = false;
 
     @Test
-    public void addPlaylist() throws InterruptedException {
-        String expectedAlert = "Created playlist \"" + playlistName + ".\"";
+    public void deletePlaylist() throws InterruptedException {
+        String expectedAlert = "Deleted playlist \"" + playlistName + ".\"";
         //Steps
         navigateToPage();
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("8qUBYosp");
         clickSubmit();
-        Thread.sleep(2000);
+        Thread.sleep(1000);
 
-        clickAddPlaylistButton();
-        clickNewPlaylist();
-        inputPlaylistName(playlistName);
-        Thread.sleep(2000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
+        boolean exists = selectPlaylist(playlistName);
+        if (!exists){
+            alreadyLoggedIn = true;
+            createPlaylist();
+        }
+        else {
+            removePlaylist();
+            confirmDelete();
+            Thread.sleep(1000);
+            WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
+            Assert.assertEquals(alert.getText(),expectedAlert);
+        }
+
+    }
+
+    @Test
+    public void createPlaylist() throws InterruptedException {
+        String expectedAlert = "Created playlist \"" + playlistName + ".\"";
+        //Steps
+        if(!alreadyLoggedIn){
+            navigateToPage();
+            provideEmail("oksana.chaklosh@testpro.io");
+            providePassword("8qUBYosp");
+            clickSubmit();
+            Thread.sleep(1000);
+        }
+
+        boolean exists = selectPlaylist(playlistName);
+        if (!exists){
+            clickAddPlaylistButton();
+            clickNewPlaylist();
+            inputPlaylistName(playlistName);
+            Thread.sleep(1000);
+            WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
+            Assert.assertEquals(alert.getText(),expectedAlert);
+        }
+
     }
 
     @Test
@@ -44,23 +76,7 @@ public class PlaylistTests extends BaseTest{
         WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
         Assert.assertEquals(alert.getText(),expectedAlert);
     }
-    @Test
-    public void deletePlaylist() throws InterruptedException {
-        String expectedAlert = "Deleted playlist \"" + playlistName + ".\"";
-        //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
-        Thread.sleep(2000);
 
-        selectPlaylist();
-        removePlaylist();
-        confirmDelete();
-        Thread.sleep(1000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
-    }
 
 
 }
