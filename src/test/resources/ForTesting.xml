@@ -4,7 +4,7 @@
 <!--  This is how to comment out in the xml  -->
 <suite name="TestNG">
     <parameter name="BaseURL" value ="https://qa.koel.app/"/>
-    <test name="Test" preserve-order="false">
+    <test name="Test" preserve-order="true">
         <classes>
             <class name="PlaylistTests">
                 <!-- <methods>

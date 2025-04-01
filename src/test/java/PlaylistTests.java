@@ -1,11 +1,14 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PlaylistTests extends BaseTest{
     public String playlistName = "1234";
-    public boolean alreadyLoggedIn = false;
+    public boolean alreadyLoggedIn = false; // user not logged in
+    // if createPlaylist was called from addSong, needs to rerun addSong
+    public boolean addSong = false;
 
     @Test
     public void deletePlaylist() throws InterruptedException {
@@ -15,7 +18,6 @@ public class PlaylistTests extends BaseTest{
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("8qUBYosp");
         clickSubmit();
-        Thread.sleep(1000);
 
         boolean exists = selectPlaylist(playlistName);
         if (!exists){
@@ -25,8 +27,8 @@ public class PlaylistTests extends BaseTest{
         else {
             removePlaylist();
             confirmDelete();
-            Thread.sleep(1000);
-            WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
+
+            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
             Assert.assertEquals(alert.getText(),expectedAlert);
         }
 
@@ -41,7 +43,6 @@ public class PlaylistTests extends BaseTest{
             provideEmail("oksana.chaklosh@testpro.io");
             providePassword("8qUBYosp");
             clickSubmit();
-            Thread.sleep(1000);
         }
 
         boolean exists = selectPlaylist(playlistName);
@@ -49,11 +50,13 @@ public class PlaylistTests extends BaseTest{
             clickAddPlaylistButton();
             clickNewPlaylist();
             inputPlaylistName(playlistName);
-            Thread.sleep(1000);
-            WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-            Assert.assertEquals(alert.getText(),expectedAlert);
-        }
 
+            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            Assert.assertEquals(alert.getText(),expectedAlert);
+            
+        }
+        
+            
     }
 
     @Test
@@ -64,19 +67,36 @@ public class PlaylistTests extends BaseTest{
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("8qUBYosp");
         clickSubmit();
-        Thread.sleep(2000);
-
+        
         searchSong("Dee");
         viewSearchResults();
         chooseFirstSong();
         clickAddToButton();
-        Thread.sleep(2000);
-        choosePlaylistToAddSongTo(playlistName);
-        Thread.sleep(1000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
+        boolean exists = choosePlaylistToAddSongTo(playlistName);
+        if (exists){
+            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            Assert.assertEquals(alert.getText(),expectedAlert);
+        }
+          // option to choose new playlist instead of existing one
+        else {
+            addNewPlaylist(playlistName);
+        }
+
     }
 
+
+    private void addNewPlaylist(String playlistName) {
+        WebElement playlistNameField;
+        playlistNameField = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//section[@id='songsWrapper']//input")));
+        playlistNameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//section[@id='songsWrapper']//input")));
+        playlistNameField = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//section[@id='songsWrapper']//input")));
+      //playlistNameField = wait.until(ExpectedConditions.and(ExpectedConditions.visibilityOfElementLocated(By.xpath("//section[@id='songsWrapper']//input")), ExpectedConditions.elementToBeClickable(By.xpath("//section[@id='songsWrapper']//input"))));
+        //WebElement playlistNameField = driver.findElement(By.xpath("//section[@id='songsWrapper']//input"));
+      playlistNameField.clear();
+      playlistNameField.sendKeys(playlistName);
+      WebElement submitButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//section[@id='songsWrapper']//button[@type='submit']")));
+      submitButton.click();
+    }
 
 
 }
