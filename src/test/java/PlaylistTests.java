@@ -26,7 +26,7 @@ public class PlaylistTests extends BaseTest{
         }
         else {
             removePlaylist();
-            //confirmDelete();
+            confirmDelete();    //SOMETIMES NEEDS TO BE DISABLED WHEN Confirmation Box does not appear
 
             WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
             Assert.assertEquals(alert.getText(),expectedAlert);
