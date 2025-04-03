@@ -8,11 +8,11 @@ public class SongTests extends BaseTest{
     @Test
     public void playSong() throws InterruptedException {
         //Steps
-        navigateToPage();
+        //navigateToPage();      moved to Base class
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("8qUBYosp");
         clickSubmit();
-        Thread.sleep(2000);
+
 
         playNextSong();
         clickPlaySong();
