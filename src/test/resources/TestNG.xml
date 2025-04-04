@@ -11,6 +11,9 @@
             <class name="RegistrationTests"/>
             <class name="ProfileTests"/>
             <class name="PlaylistTests"/>
+            <class name="ContextClick"/>
+            <class name="Hover"/>
+            <class name="CountPlaylistSongs"/>
         </classes>
     </test>
 </suite>

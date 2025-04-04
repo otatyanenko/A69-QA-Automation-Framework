@@ -5,7 +5,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class PlaylistTests extends BaseTest{
-    public String playlistName = "12345";
+    public String playlistName = "mkl";
     public boolean alreadyLoggedIn = false; // user not logged in
     // if createPlaylist was called from addSong, needs to rerun addSong
     public boolean addSong = false;
@@ -53,7 +53,7 @@ public class PlaylistTests extends BaseTest{
             clickNewPlaylist();
             inputPlaylistName(playlistName);
 
-            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            WebElement alert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
             Assert.assertEquals(alert.getText(),expectedAlert);
             
         }
@@ -74,7 +74,7 @@ public class PlaylistTests extends BaseTest{
         clickAddToButton();
         boolean exists = choosePlaylistToAddSongTo(playlistName);
         if (exists){
-            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            WebElement alert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
             Assert.assertEquals(alert.getText(),expectedAlert);
         }
           // option to choose new playlist instead of existing one
@@ -83,4 +83,42 @@ public class PlaylistTests extends BaseTest{
         }
 
     }
+
+    @Test
+    public void countSongsInPlaylist() throws InterruptedException {
+        provideEmail("oksana.chaklosh@testpro.io");
+        providePassword("8qUBYosp");
+        clickSubmit();
+
+        boolean exists = selectPlaylist("abc");
+        if (exists){
+            displayAllSongs();
+            Assert.assertTrue(getPlaylistDetails().contains(String.valueOf(countSongs())));
+        }
+        else {
+            alreadyLoggedIn = true;
+            createPlaylist();
+        }
+    }
+
+    public String newPlaylistName = "Test Edited Playlist";
+
+    @Test
+    public void renamePlaylist(){
+        String updatedPlaylistMsg = "Updated playlist \"Test Edited Playlist.\"";
+
+        provideEmail("oksana.chaklosh@testpro.io");
+        providePassword("8qUBYosp");
+        clickSubmit();
+
+        doubleClickPlaylist();
+        enterNewPlaylistName(newPlaylistName);
+        Assert.assertEquals(getRenamePlaylistSuccessMsg(), updatedPlaylistMsg);
+    }
+
 }
+
+
+
+
+
