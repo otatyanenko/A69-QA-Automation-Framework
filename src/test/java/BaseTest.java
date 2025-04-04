@@ -175,6 +175,17 @@ public class BaseTest {
         return exists;
     }
 
+    public boolean checkIfPlaylistEmpty() {
+        boolean empty = false;
+        try {
+            WebElement meta = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[@class='meta']")));
+
+        } catch (Exception e) {
+            empty = true;
+        }
+        return empty;
+    }
+
     public void removePlaylist() {
         WebElement deleteButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@class='del btn-delete-playlist']")));
         deleteButton.click();

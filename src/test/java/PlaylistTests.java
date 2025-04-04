@@ -36,17 +36,6 @@ public class PlaylistTests extends BaseTest{
 
     }
 
-    private boolean checkIfPlaylistEmpty() {
-        boolean empty = false;
-        try {
-            WebElement meta = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[@class='meta']")));
-
-        } catch (Exception e) {
-           empty = true;
-        }
-        return empty;
-    }
-
     @Test
     public void createPlaylist() throws InterruptedException {
         String expectedAlert = "Created playlist \"" + playlistName + ".\"";
@@ -68,8 +57,6 @@ public class PlaylistTests extends BaseTest{
             Assert.assertEquals(alert.getText(),expectedAlert);
             
         }
-        
-            
     }
 
     @Test
@@ -96,6 +83,4 @@ public class PlaylistTests extends BaseTest{
         }
 
     }
-
-
 }
