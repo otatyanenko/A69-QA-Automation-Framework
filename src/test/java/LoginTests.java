@@ -7,7 +7,7 @@ public class LoginTests extends BaseTest {
     @Test
     public void loginValidEmailValidPassword() {
         //Steps
-        navigateToPage();
+        //navigateToPage();    moved to Base class
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("8qUBYosp");
         clickSubmit();
@@ -22,7 +22,7 @@ public class LoginTests extends BaseTest {
     public void loginInvalidEmailValidPassword(String email, String password) {
 
         //Steps
-        navigateToPage();
+        //navigateToPage();    moved to Base class
         provideEmail(email);
         providePassword(password);
         clickSubmit();
@@ -36,7 +36,7 @@ public class LoginTests extends BaseTest {
     public void loginValidEmailEmptyPassword() {
 
         //Steps
-        navigateToPage();
+        //navigateToPage();  moved to Base class
         provideEmail("oksana.chaklosh@testpro.io");
         providePassword("");
         clickSubmit();
