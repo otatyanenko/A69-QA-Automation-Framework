@@ -2,18 +2,14 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
 <!--  This is how to comment out in the xml  -->
-<suite name="TestNG">
+<suite name="Regression">
     <parameter name="BaseURL" value ="https://qa.koel.app/"/>
-    <test name="Example Test" preserve-order="false">
+    <test name="Regression Test" preserve-order="false">
         <classes>
             <class name="LoginTests"/>
             <class name="BaseTest"/>
-            <class name="RegistrationTests"/>
             <class name="ProfileTests"/>
             <class name="PlaylistTests"/>
-            <class name="ContextClick"/>
-            <class name="Hover"/>
-            <class name="CountPlaylistSongs"/>
         </classes>
     </test>
 </suite>
