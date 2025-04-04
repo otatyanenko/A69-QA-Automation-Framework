@@ -25,13 +25,26 @@ public class PlaylistTests extends BaseTest{
             createPlaylist();
         }
         else {
+            boolean empty = checkIfPlaylistEmpty();
             removePlaylist();
-            confirmDelete();    //SOMETIMES NEEDS TO BE DISABLED WHEN Confirmation Box does not appear
-
-            WebElement alert = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            if(!empty) {
+                confirmDelete();    //SOMETIMES NEEDS TO BE DISABLED WHEN Confirmation Box does not appear
+            }
+            WebElement alert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
             Assert.assertEquals(alert.getText(),expectedAlert);
         }
 
+    }
+
+    private boolean checkIfPlaylistEmpty() {
+        boolean empty = false;
+        try {
+            WebElement meta = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//span[@class='meta']")));
+
+        } catch (Exception e) {
+           empty = true;
+        }
+        return empty;
     }
 
     @Test
