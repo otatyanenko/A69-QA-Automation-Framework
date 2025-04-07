@@ -1,66 +1,138 @@
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.*;
 
 public class PlaylistTests extends BaseTest{
-    public String playlistName = "1234";
+    public String playlistName = "mkl";
+    public boolean alreadyLoggedIn = false; // user not logged in
+    // if createPlaylist was called from addSong, needs to rerun addSong
+    public boolean addSong = false;
 
-    @Test
-    public void addPlaylist() throws InterruptedException {
-        String expectedAlert = "Created playlist \"" + playlistName + ".\"";
-        //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
-        Thread.sleep(2000);
-
-        clickAddPlaylistButton();
-        clickNewPlaylist();
-        inputPlaylistName(playlistName);
-        Thread.sleep(2000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
-    }
-
-    @Test
-    public void addSongToPlaylist() throws InterruptedException {
-        String expectedAlert = "Added 1 song into \"" + playlistName + ".\"";
-        //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
-        Thread.sleep(2000);
-
-        searchSong("Dee");
-        viewSearchResults();
-        chooseFirstSong();
-        clickAddToButton();
-        Thread.sleep(2000);
-        choosePlaylistToAddSongTo(playlistName);
-        Thread.sleep(1000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
-    }
     @Test
     public void deletePlaylist() throws InterruptedException {
         String expectedAlert = "Deleted playlist \"" + playlistName + ".\"";
-        //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
-        Thread.sleep(2000);
 
-        selectPlaylist();
-        removePlaylist();
-        confirmDelete();
-        Thread.sleep(1000);
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertEquals(alert.getText(),expectedAlert);
+        LoginPage loginPage = new LoginPage(driver);
+        SongsPage songsPage = new SongsPage(driver);
+        HomePage homePage = new HomePage(driver);
+        LeftNavPanelPage leftNavPanelPage = new LeftNavPanelPage(driver);
+
+        //Steps
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+
+        boolean exists = leftNavPanelPage.selectPlaylistSideMenu(playlistName);
+        if (!exists){
+            alreadyLoggedIn = true;
+            createPlaylist();
+        }
+        else {
+            boolean empty = songsPage.checkIfPlaylistEmpty();
+            songsPage.removePlaylist();
+            if(!empty) {
+                songsPage.confirmDelete();    //SOMETIMES NEEDS TO BE DISABLED WHEN Confirmation Box does not appear
+            }
+            //WebElement alert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            Assert.assertEquals(homePage.getTextFromAlert(),expectedAlert);
+        }
+
     }
 
+    //Creating a playlist using plus sign on left panel
+    @Test
+    public void createPlaylist() throws InterruptedException {
+        String expectedAlert = "Created playlist \"" + playlistName + ".\"";
+
+        LeftNavPanelPage leftNavPanelPage = new LeftNavPanelPage(driver);
+        HomePage homePage = new HomePage(driver);
+        //Steps
+        if(!alreadyLoggedIn){
+            LoginPage loginPage = new LoginPage(driver);
+            //Steps
+            loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+        }
+
+        boolean exists = leftNavPanelPage.selectPlaylistSideMenu(playlistName);
+        if (!exists){
+            leftNavPanelPage.clickAddPlaylistButtonPlusSign();
+            leftNavPanelPage.clickNewPlaylist();
+            leftNavPanelPage.inputPlaylistName(playlistName);
+
+            //WebElement alert = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[class='alertify-logs top right']")));
+            Assert.assertEquals(homePage.getTextFromAlert(),expectedAlert);
+            
+        }
+    }
+
+    //Searching for song through search on left panel; then choosing the first song from the list to add
+    //either to existing playlist or new playlist
+    @Test
+    public void addSongToPlaylist() throws InterruptedException {
+        String expectedAlert = "Added 1 song into \"" + playlistName + ".\"";
+
+        LoginPage loginPage = new LoginPage(driver);
+        LeftNavPanelPage leftNavPanelPage = new LeftNavPanelPage(driver);
+        SongsPage songsPage = new SongsPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        //Steps
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+        
+        leftNavPanelPage.searchSong("Dee");
+        songsPage.viewSearchResults();
+        songsPage.chooseFirstSong();
+        songsPage.clickAddToButton();
+        boolean exists = songsPage.choosePlaylistToAddSongTo(playlistName);
+        if (exists){
+            Assert.assertEquals(homePage.getTextFromAlert(),expectedAlert);
+        }
+          // option to choose new playlist instead of existing one
+        else {
+            songsPage.addNewPlaylist(playlistName);
+        }
+
+    }
+
+    @Test
+    public void countSongsInPlaylist() throws InterruptedException {
+        LoginPage loginPage = new LoginPage(driver);
+        LeftNavPanelPage leftNavPanelPage = new LeftNavPanelPage(driver);
+        SongsPage songsPage = new SongsPage(driver);
+
+        //Steps
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+
+        boolean exists = leftNavPanelPage.selectPlaylistSideMenu("dfg");
+        if (exists){
+            songsPage.displayAllSongsToConsole();
+            Assert.assertTrue(songsPage.getPlaylistDetails().contains(String.valueOf(songsPage.countSongs())));
+        }
+        else {
+            alreadyLoggedIn = true;
+            createPlaylist();
+        }
+    }
+
+    public String newPlaylistName = "Test Edited Playlist3";
+
+    @Test
+    public void renamePlaylist()  {
+        String updatedPlaylistMsg = "Updated playlist \"Test Edited Playlist3.\"";
+
+        LoginPage loginPage = new LoginPage(driver);
+        LeftNavPanelPage leftNavPanelPage = new LeftNavPanelPage(driver);
+        HomePage homePage = new HomePage(driver);
+
+        //Steps
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+
+        leftNavPanelPage.doubleClickPlaylist();
+        leftNavPanelPage.enterNewPlaylistName(newPlaylistName);
+        Assert.assertEquals(homePage.getTextFromAlert(), updatedPlaylistMsg);
+    }
 
 }
+
+
+
+
+
