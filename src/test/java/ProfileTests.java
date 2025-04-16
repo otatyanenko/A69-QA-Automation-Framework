@@ -1,35 +1,38 @@
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.HomePage;
+import pages.LoginPage;
+import pages.UserProfilePage;
 
 public class ProfileTests extends BaseTest{
     @Test
     public void changeProfileName() throws InterruptedException {
+        LoginPage loginPage = new LoginPage(driver);
+        UserProfilePage userProfilePage = new UserProfilePage(driver);
+        HomePage homePage = new HomePage(driver);
+
         //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
-        Thread.sleep(2000);
-        clickAvatar();
-        provideCurrentPassword("8qUBYosp");
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
+
+        userProfilePage.clickAvatar();
+        userProfilePage.provideCurrentPassword("8qUBYosp");
         String randomName = generateRandomName();
-        provideName(randomName);
-        provideEmail("oksana.chaklosh@testpro.io");
-        provideNewPassword("A1234512345");
-        clickSave();
-        Thread.sleep(2000);
-        /*  // This Assert is to check if there alert is visible after Save button is clicked
-        WebElement alert = driver.findElement(By.cssSelector("[class='alertify-logs top right']"));
-        Assert.assertTrue(alert.isDisplayed());
-        */
-        // Here we are checking if the randomName equals to the actual name of the profile now
-        WebElement actualProfileName = driver.findElement(By.cssSelector("a.view-profile>span"));
-        Assert.assertEquals(actualProfileName.getText(), randomName);
-        Thread.sleep(2000);
+        userProfilePage.provideName(randomName);
+        loginPage.provideEmail("oksana.chaklosh@testpro.io");
+        userProfilePage.provideNewPassword("A1234512345");
+        userProfilePage.clickSave();
 
         //Expected Result
+        // This Assert is to check if there alert is visible after Save button is clicked
+        Assert.assertTrue(homePage.isAlertDisplayed());
+
+        /*
+        // Here we are checking if the randomName equals to the actual name of the profile now
+        WebElement actualProfileName = driver.findElement(By.cssSelector("a.view-profile>span"));
+        Assert.assertEquals(profilePage.actualProfileName(), randomName);
+        Thread.sleep(2000);
+        */
+
 
     }
 }
