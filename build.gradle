@@ -15,11 +15,17 @@ dependencies {
     testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0'
     // https://mvnrepository.com/artifact/com.github.javafaker/javafaker
     implementation("com.github.javafaker:javafaker:1.0.2")
+
+    implementation 'io.cucumber:cucumber-testng:7.9.0'
+    implementation 'io.cucumber:cucumber-core:7.9.0'
+    implementation 'io.cucumber:cucumber-java:7.9.0'
+    implementation 'io.cucumber:gherkin:25.0.2'
 }
 
 test {
     useTestNG() {
-        suites "src/test/resources/TestNG.xml"
+        //suites "src/test/resources/TestNG.xml"
+        suites "src/test/resources/cucumber.xml"
         /* We add this line to use Grid
         //Now we can specify which browser to use during Test using following commend
         //gradle clean test -Dbrowser=edge
