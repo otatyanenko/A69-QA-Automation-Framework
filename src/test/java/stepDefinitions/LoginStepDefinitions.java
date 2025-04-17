@@ -75,7 +75,8 @@ public class LoginStepDefinitions {
     public void iAmLoggedIn() {
         HomePage homePage = new HomePage(driver);
         //Expected Result
-        Assert.assertTrue(homePage.isAvatarIconDisplayed());
+        //Assert.assertTrue(homePage.isAvatarIconDisplayed());
+        Assert.assertTrue(wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("img[class='avatar']"))).isDisplayed());
     }
 
     @After
