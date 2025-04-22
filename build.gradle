@@ -19,7 +19,9 @@ dependencies {
 
 test {
     useTestNG() {
-        suites "src/test/resources/TestNG.xml"
+        //To use Jenkins pipeline and a variable to use different suites we do following
+            suites("src/test/resources/${suite}.xml")
+       // suites "src/test/resources/TestNG.xml"
         /* We add this line to use Grid
         //Now we can specify which browser to use during Test using following commend
         //gradle clean test -Dbrowser=edge
