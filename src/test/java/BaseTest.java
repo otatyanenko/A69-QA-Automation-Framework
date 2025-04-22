@@ -97,7 +97,11 @@ public class BaseTest {
     private WebDriver pickBrowser(String browser) throws MalformedURLException {
         DesiredCapabilities capabilities = new DesiredCapabilities();
         String gridURL = "http://192.168.1.200:4444";
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--remote-allow-origins=*");
         switch (browser) {
+            case "chrome":
+                return driver= new ChromeDriver(chromeOptions);
             case "firefox":
                 WebDriverManager.firefoxdriver().setup();
                 return driver = new FirefoxDriver();
@@ -139,11 +143,11 @@ public class BaseTest {
                 return getLambdaDriver();
             default:
                 WebDriverManager.chromedriver().setup();
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--remote-allow-origins=*");
-                options.addArguments("--disable-notifications");
-                options.addArguments("--start-maximized");
-                return driver = new ChromeDriver(options);
+                //ChromeOptions options = new ChromeOptions();
+                chromeOptions.addArguments("--remote-allow-origins=*");
+                chromeOptions.addArguments("--disable-notifications");
+                chromeOptions.addArguments("--start-maximized");
+                return driver = new ChromeDriver(chromeOptions);
         }
     }
     //java -jar selenium-server-4.31.0.jar standalone
