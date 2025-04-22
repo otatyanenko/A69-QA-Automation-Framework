@@ -13,10 +13,20 @@ dependencies {
     testImplementation 'org.testng:testng:7.6.1'
     implementation 'org.seleniumhq.selenium:selenium-java:4.5.0'
     testImplementation 'io.github.bonigarcia:webdrivermanager:5.8.0'
+    // https://mvnrepository.com/artifact/com.github.javafaker/javafaker
+    implementation("com.github.javafaker:javafaker:1.0.2")
 }
 
 test {
     useTestNG() {
         suites "src/test/resources/TestNG.xml"
+        /* We add this line to use Grid
+        //Now we can specify which browser to use during Test using following commend
+        //gradle clean test -Dbrowser=edge
+        // (edge can be substituted by other browser choices from pickBrowser() in BaseTest.java
+        //You can also use This Commend
+        //./gradlew clean test -Dbrowser=edge
+        clean - cleans cleans out previous results from previous tests   */
+        systemProperty "browser", System.getProperty("browser")
     }
 }

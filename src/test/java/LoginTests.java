@@ -2,47 +2,43 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.HomePage;
+import pages.LoginPage;
 
 public class LoginTests extends BaseTest {
     @Test
     public void loginValidEmailValidPassword() {
+        // we replaced (driver) To (getDriver()) everywhere
+        //LoginPage loginPage = new LoginPage(driver);
+        LoginPage loginPage = new LoginPage(getDriver());
+        HomePage homePage = new HomePage(getDriver());
         //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("8qUBYosp");
-        clickSubmit();
+        loginPage.login("oksana.chaklosh@testpro.io", "8qUBYosp" );
 
-        WebElement avatarIcon = driver.findElement(By.cssSelector("img[class='avatar']"));
         //Expected Result
-        Assert.assertTrue(avatarIcon.isDisplayed());
+        Assert.assertTrue(homePage.isAvatarIconDisplayed());
 
     }
 
     @Test (dataProvider = "IncorrectLoginData", dataProviderClass = BaseTest.class)
     public void loginInvalidEmailValidPassword(String email, String password) {
-
+        LoginPage loginPage = new LoginPage(getDriver());
         //Steps
-        navigateToPage();
-        provideEmail(email);
-        providePassword(password);
-        clickSubmit();
+        loginPage.login(email, password );
 
         //Expected Result
-        Assert.assertEquals(driver.getCurrentUrl(), url);
+        Assert.assertEquals(getDriver().getCurrentUrl(), url);
 
     }
 
     @Test
     public void loginValidEmailEmptyPassword() {
-
+        LoginPage loginPage = new LoginPage(getDriver());
         //Steps
-        navigateToPage();
-        provideEmail("oksana.chaklosh@testpro.io");
-        providePassword("");
-        clickSubmit();
+        loginPage.login("oksana.chaklosh@testpro.io", "" );
 
         //Expected Result
-        Assert.assertEquals(driver.getCurrentUrl(), url);
+        Assert.assertEquals(getDriver().getCurrentUrl(), url);
 
     }
 }
