@@ -5,18 +5,50 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.*;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class BaseTest {
     public WebDriver driver = null;
     public String url = "https://qa.koel.app/";
+    public WebDriverWait wait = null;
+    public FluentWait waitFluent = null;
+    public Actions actions = null;
+    private static final ThreadLocal<WebDriver> threadDriver = new ThreadLocal<>();     // for parallel testing
 
     @BeforeSuite
     static void setupClass() {
-        WebDriverManager.chromedriver().setup();
+        //now we will be using Grid
+        //WebDriverManager.chromedriver().setup();
+    }
+
+    /* For Parallel Execution
+    threadDriver of type ThreadLocal<WebDriver>. ThreadLocal is a mechanism that allows storing and
+    retrieving unique variable values for each thread. In this case, ThreadLocal<WebDriver> will be used
+    to store an instance of WebDriver associated with each thread during test execution.
+     */
+    //This getDriver() method returns the current instance of WebDriver associated with the current thread.
+    public static WebDriver getDriver(){
+        return threadDriver.get();
     }
 
     @DataProvider(name="IncorrectLoginData")
@@ -35,132 +67,140 @@ public class BaseTest {
 
     @BeforeMethod
     @Parameters({"BaseURL"})
-    public void launchBrowser(String BaseURL){
+    public void launchBrowser(String BaseURL) throws MalformedURLException {
         //Added ChromeOptions argument below to fix websocket error
-        ChromeOptions options = new ChromeOptions();
+       /*ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--disable-notifications");
+        */
+        //driver = new ChromeDriver(options);
 
-        driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        driver.manage().window().maximize();
+        threadDriver.set(pickBrowser(System.getProperty("browser")));                  // for parallel testing
+        getDriver().manage().timeouts().implicitlyWait(Duration.ofSeconds(5));         // for parallel testing
+        getDriver().manage().window().maximize();                                       // for parallel testing
+        //We are preparing to use Grid
+        //driver = pickBrowser(System.getProperty("browser"));
+
+       // driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+        //driver.manage().window().maximize();
+
+        //
+        //waitFluent = new FluentWait(getDriver());
+        wait = new WebDriverWait(getDriver(), Duration.ofSeconds(5));
+
+        //Actions class
+        actions = new Actions(getDriver());
         url = BaseURL;
         navigateToPage();
     }
+
+    private WebDriver pickBrowser(String browser) throws MalformedURLException {
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        String gridURL = "http://192.168.1.200:4444";
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--remote-allow-origins=*");
+        switch (browser) {
+            case "chrome":
+                return driver= new ChromeDriver(chromeOptions);
+            case "firefox":
+                WebDriverManager.firefoxdriver().setup();
+                return driver = new FirefoxDriver();
+            case "safari":
+                WebDriverManager.safaridriver().setup();
+                return driver = new SafariDriver();
+            case "edge":
+                WebDriverManager.edgedriver().setup();
+                EdgeOptions edgeOptions = new EdgeOptions();
+                edgeOptions.addArguments("--remote-allow-origins=*");
+                return driver = new EdgeDriver(edgeOptions);
+            case "grid-firefox":
+                capabilities.setCapability("browserName", "firefox");
+                return driver = new RemoteWebDriver(URI.create(gridURL).toURL(), capabilities);
+            case "grid-edge":
+                capabilities.setCapability("browserName", "MicrosoftEdge");
+                return driver = new RemoteWebDriver(URI.create(gridURL).toURL(), capabilities);
+            /*    IE must be installed even though it was showing on the grid
+            I was getting following ERROR
+                You're using an unsupported command-line flag: --ie-mode-force
+             What it means is that it comes from Microsoft Edge, it is
+             trying to run in IE mode or something resembling it.
+                I decided to comment out IE use
+            case "grid-ie":
+                InternetExplorerOptions ieOptions = new InternetExplorerOptions();
+                ieOptions.ignoreZoomSettings();
+                ieOptions.introduceFlakinessByIgnoringSecurityDomains();
+                ieOptions.requireWindowFocus();
+                ieOptions.enablePersistentHovering();
+                ieOptions.destructivelyEnsureCleanSession();
+                ieOptions.setCapability("browserName", "internet explorer");
+                //capabilities.setCapability("browserName", "internet explorer");
+                return driver = new RemoteWebDriver(URI.create(gridURL).toURL(), ieOptions);
+            */
+            case "grid-safari":
+                capabilities.setCapability("browserName", "safari");
+                return driver = new RemoteWebDriver(URI.create(gridURL).toURL(), capabilities);
+            case "cloud":
+                return getLambdaDriver();
+            default:
+                WebDriverManager.chromedriver().setup();
+                //ChromeOptions options = new ChromeOptions();
+                chromeOptions.addArguments("--remote-allow-origins=*");
+                chromeOptions.addArguments("--disable-notifications");
+                chromeOptions.addArguments("--start-maximized");
+                return driver = new ChromeDriver(chromeOptions);
+        }
+    }
+    //java -jar selenium-server-4.31.0.jar standalone
+
+    public WebDriver getLambdaDriver() throws MalformedURLException {
+        String userName = "toksana";
+        String authKey = "LT_1TLNxACvMwscTouqE0gsdfzZ2oHkPmL0SIO7yHdF5lJfrGF";
+        String  hubURL = "https://hub.lambdatest.com/wd/hub";
+
+        DesiredCapabilities capabilities = new DesiredCapabilities();
+        capabilities.setCapability("browserName", "Chrome");
+        capabilities.setCapability("browserVersion", "134.0");
+        HashMap<String, Object> ltOptions = new HashMap<>();
+
+        ltOptions.put("username", userName);
+        ltOptions.put("accessKey", authKey);
+        ltOptions.put("build", "MyTests");
+        ltOptions.put("project", "Koel App");
+        ltOptions.put("w3c", true);
+        ltOptions.put("plugin", "java-testNG");
+        ltOptions.put("platformName", "Windows 10");
+        capabilities.setCapability("LT:Options", ltOptions);
+        return new RemoteWebDriver(new URL(hubURL), capabilities);
+
+    }
     @AfterMethod
     public void closeBrowser(){
-        driver.quit();
+        //driver.quit();   now we will have multiple drivers
+        threadDriver.get().close();               // for parallel testing
+        threadDriver.remove();                    // for parallel testing
     }
 
     public void navigateToPage() {
-        driver.get(url);
+        getDriver().get(url);                       // for parallel testing
+        //driver.get(url);
     }
 
-    public void provideEmail(String email) {
-        WebElement emailField = driver.findElement(By.cssSelector("[type='email']"));
-        emailField.clear();
-        emailField.sendKeys(email);
+
+    /*/ RANDOM GENERATORS
+    public String generateRandomPlaylistName(){
+        Faker faker = new Faker (new Locale("en-US"));
+        String newName = faker.address().country();
+        return newName;
     }
 
-    public void providePassword(String password) {
-        WebElement passwordField = driver.findElement(By.cssSelector("[type='password']"));
-        passwordField.clear();
-        passwordField.sendKeys(password);
-    }
-
-    public void clickSubmit() {
-        WebElement submitButton = driver.findElement(By.cssSelector("[type='submit']"));
-        submitButton.click();
-    }
-
-    public void clickAvatar() {
-        WebElement avatarIcon = driver.findElement(By.cssSelector("img[class='avatar']"));
-        avatarIcon.click();
-    }
-
-    public void provideCurrentPassword(String currentPassword) {
-        WebElement currentPasswordField = driver.findElement(By.cssSelector("input[id='inputProfileCurrentPassword']"));
-        currentPasswordField.clear();
-        currentPasswordField.sendKeys(currentPassword);
-    }
-
-    public void provideName(String name) {
-        WebElement nameField = driver.findElement(By.cssSelector("input[id='inputProfileName']"));
-        nameField.clear();
-        nameField.sendKeys(name);
-    }
-
-    public void provideNewPassword(String password) {
-        WebElement newPasswordField = driver.findElement(By.cssSelector("input[id='inputProfileNewPassword']"));
-        newPasswordField.clear();
-        newPasswordField.sendKeys(password);
-    }
-
-    public void clickSave() {
-        WebElement saveButton = driver.findElement(By.cssSelector("[class='btn-submit']"));
-        saveButton.click();
-    }
+    public String generateRandomNameOtherWay(){
+        Faker faker = new Faker (new Locale("en-US"));
+        String newName = faker.name().firstName;
+        return newName;
+    }    */
 
     public String generateRandomName(){
         return UUID.randomUUID().toString().replace("-","");
     }
 
-    public void searchSong(String song){
-        WebElement searchField = driver.findElement(By.cssSelector("[type='search']"));
-        searchField.clear();
-        searchField.sendKeys(song);
-        searchField.sendKeys(Keys.RETURN);
-    }
-
-    public void viewSearchResults() {
-        WebElement viewAll = driver.findElement(By.cssSelector("button[data-test='view-all-songs-btn']"));
-        viewAll.click();
-    }
-
-    public void chooseFirstSong() {
-        WebElement firstSong = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//table[@class='items']//tr[1]"));
-        firstSong.click();
-    }
-
-    public void clickAddToButton() {
-        WebElement addToButton = driver.findElement(By.cssSelector("[class='btn-add-to']"));
-        addToButton.click();
-    }
-
-    public void choosePlaylistToAddSongTo(String playlistName) {
-        //WebElement playlist = driver.findElement(By.cssSelector("section[id='queueWrapper'] li:nth-of-type(5)"));
-        //WebElement playlist = driver.findElement(By.xpath("//section[@id='queueWrapper']//li[5]"));
-        WebElement playlist = driver.findElement(By.xpath("//section[@id='songResultsWrapper']//li[contains(text(),'" + playlistName + "')]"));
-        playlist.click();
-    }
-
-    protected void selectPlaylist() {
-        WebElement selectedPlaylist = driver.findElement(By.xpath("//section[@id='playlists']//li[6]"));
-        selectedPlaylist.click();
-    }
-
-    protected void removePlaylist() {
-        WebElement deleteButton = driver.findElement(By.xpath("//button[@class='del btn-delete-playlist']"));
-        deleteButton.click();
-    }
-
-    protected void confirmDelete() {
-        WebElement okButton = driver.findElement(By.xpath("//button[@class='ok']"));
-        okButton.click();
-    }
-
-    protected void clickAddPlaylistButton() {
-        WebElement addPlaylistButton = driver.findElement(By.xpath("//i[@data-testid='sidebar-create-playlist-btn']"));
-        addPlaylistButton.click();
-    }
-
-    protected void clickNewPlaylist() {
-        WebElement newPlaylist = driver.findElement(By.xpath("//li[@data-testid='playlist-context-menu-create-simple']"));
-        newPlaylist.click();
-    }
-
-    protected void inputPlaylistName(String name) {
-        WebElement playlistNameField = driver.findElement(By.xpath("//form[@class='create']//input"));
-        playlistNameField.sendKeys(name);
-        playlistNameField.sendKeys(Keys.RETURN);
-    }
 }
